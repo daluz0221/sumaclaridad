@@ -1,3 +1,68 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.utils.translation import gettext_lazy as _
 
-# Register your models here.
+from .models import User
+
+@admin.register(User)
+class UserAdmin(DjangoUserAdmin):
+    ordering = ('-date_joined',)
+    list_display = (
+        'email',
+        'name',
+        'phone',
+        'is_staff',
+        'is_active',
+        'date_joined',
+        'accepted_consent',
+    )
+    list_filter = ('role', 'is_staff', 'is_active', 'prefer_language', 'accepted_consent')
+    search_fields = ('email', 'name', 'phone', 'company', 'profession')
+
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        (_('Perfil'), {
+            'fields': (
+                'name',
+                'phone',
+                'position',
+                'company',
+                'profession',
+                'prefer_language',
+                'role',
+            ),
+        }),
+        (_('Consentimiento'), {
+            'fields': ('accepted_consent', 'consent_date'),
+        }),
+        (_('Permisos'), {
+            'fields': (
+                'is_active',
+                'is_staff',
+                'is_superuser',
+                'groups',
+                'user_permissions',
+            ),
+        }),
+        (_('Fechas'), {
+            'fields': ('last_login', 'date_joined'),
+        }),
+    )
+    add_fieldsets = (
+        (None, {
+             'classes': ('wide',),
+            'fields': (
+                'email',
+                'name',
+                'phone',
+                'position',
+                'password1',
+                'password2',
+                'is_staff',
+                'is_superuser',
+                'role',
+            ),
+        })
+    )
+    readonly_fields = ('consent_date', 'date_joined', 'last_login')
+    filter_horizontal = ('groups', 'user_permissions')

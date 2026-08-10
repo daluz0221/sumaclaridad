@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Perfil{% endblock %}
+{% block content %}
+<h1>Hola, {{ user.name }}</h1>
+<ul>
+  <li>Email: {{ user.email }}</li>
+  <li>Rol: {{ user.get_role_display }}</li>
+  <li>Idioma: {{ user.get_prefer_language_display }}</li>
+  <li>Consentimiento: {{ user.accepted_consent }} ({{ user.consent_date }})</li>
+</ul>
+{% endblock %}

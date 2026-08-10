@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Jefes a Punto{% endblock %}</title>
+</head>
+<body>
+  <header>
+    <a href="{% url 'accounts:login' %}">Jefes a Punto</a>
+    <nav>
+      {% if user.is_authenticated %}
+        <a href="{% url 'accounts:profile' %}">Perfil</a>
+        <a href="{% url 'curso:home' %}">Curso</a>
+        <form action="{% url 'accounts:logout' %}" method="post" style="display:inline">
+          {% csrf_token %}
+          <button type="submit">Salir</button>
+        </form>
+      {% else %}
+        <a href="{% url 'accounts:login' %}">Entrar</a>
+        <a href="{% url 'accounts:register' %}">Registro</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main>
+    {% if messages %}
+      <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

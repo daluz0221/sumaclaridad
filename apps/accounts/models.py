@@ -30,12 +30,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    data_joined = models.DateTimeField(default=timezone.now)
+    date_joined = models.DateTimeField(default=timezone.now)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name',, 'phone', 'position']
+    REQUIRED_FIELDS = ['name', 'phone', 'position']
 
     def __str__(self):
         return self.email

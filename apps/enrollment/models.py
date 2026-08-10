@@ -27,12 +27,20 @@ class Enrollment(models.Model):
         base = since or self.activation_date or timezone.now()
         return base + relativedelta(months=6)
 
+    def _assign_alumno_role(self):
+
+        user = self.user
+        if user.role != user.Role.ADMIN:
+            user.role = user.Role.ALUMNO
+            user.save(update_fields=['role'])
+
     def activate(self, when=None):
         when = when or timezone.now()
         self.active_access = True
         self.activation_date = when
         self.expiration_date = self.calculate_expiration_date(when)
-        self.save()
+        super().save()
+        self._assign_alumno_role()
 
     def is_in_effect(self):
         if not self.active_access or not self.expiration_date:
@@ -43,4 +51,29 @@ class Enrollment(models.Model):
         self.active_access = False
         self.activation_date = None
         self.expiration_date = None
-        self.save()
+        super().save()
+
+    def save(self, *args, **kwargs):
+        if self.active_access and not self.activation_date:
+            self.activation_date = timezone.now()
+            self.expiration_date = self.calculate_expiration_date(self.activation_date)
+        elif self.active_access and self.activation_date and not self.expiration_date:
+            self.expiration_date = self.calculate_expiration_date(self.activation_date)
+        
+        is_new_activation = (
+            self.active_access
+            and self.pk is not None
+        )
+
+        previous_active = False
+        if self.pk:
+            previous_active = (
+                Enrollment.objects.filter(pk=self.pk)
+                .values_list('active_access', flat=True)
+                .first()
+            ) or False
+
+        super().save(*args, **kwargs)
+
+        if self.active_access and not previous_active:
+            self._assign_alumno_role()
