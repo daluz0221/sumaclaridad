@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ module_titulo }}{% endblock %}
+{% block content %}
+<p class="crumb">
+  <a href="{% url 'curso:module_list' course.slug %}">← {{ course_titulo }}</a>
+</p>
+<h1>{{ module_titulo }}</h1>
+
+<section class="card stack">
+  <h2>Introducción</h2>
+  {% if module_intro %}
+    <p>{{ module_intro|linebreaksbr }}</p>
+  {% else %}
+    <p class="muted">Sin introducción todavía.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h2>Vídeos</h2>
+  {% for item in video_items %}
+    <article class="card">
+      <h3>{{ item.titulo }}</h3>
+      <p class="muted">Vídeo privado (placeholder Semana 2).</p>
+      {% if item.resource.video_ref %}
+        <p>Referencia: <code>{{ item.resource.video_ref }}</code></p>
+      {% endif %}
+      <div class="placeholder">Aquí irá el player de Bunny Stream en la Semana 3.</div>
+    </article>
+  {% empty %}
+    <p class="empty">No hay vídeos en este módulo.</p>
+  {% endfor %}
+</section>
+
+<section>
+  <h2>Texto</h2>
+  {% for item in texto_items %}
+    <article class="card">
+      <h3>{{ item.titulo }}</h3>
+      {% if item.texto %}
+        <p>{{ item.texto|linebreaksbr }}</p>
+      {% endif %}
+    </article>
+  {% empty %}
+    <p class="empty">No hay texto adicional.</p>
+  {% endfor %}
+</section>
+
+<section>
+  <h2>PDFs</h2>
+  {% for item in pdf_items %}
+    <article class="card">
+      <h3>{{ item.titulo }}</h3>
+      <p class="muted">PDF con marca de agua (placeholder Semana 2).</p>
+      {% if item.resource.pdf_ref %}
+        <p>Referencia: <code>{{ item.resource.pdf_ref }}</code></p>
+      {% endif %}
+      <p>
+        <button type="button" disabled>Descargar (disponible en Semana 3)</button>
+      </p>
+    </article>
+  {% empty %}
+    <p class="empty">No hay PDFs en este módulo.</p>
+  {% endfor %}
+</section>
+{% endblock %}

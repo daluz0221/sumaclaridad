@@ -1,0 +1,17 @@
+1. el acceso al curso caduca cada 6 meses
+2. el diseño lo provee el cliente
+3. hay que generar textos legales para diversos paises ya que se piensa que la app se vea en LATAM, españa y USA
+4. el acceso a los módulos será libre
+5. el registro de usuarios será tradicional, es decir, el usuario se registra por su cuenta, y desde el admin se activa check "compró curso (o algo así)" una vez pague por el curso
+6. datos que se necesitas -> nombre, email, telefono, empresa, cargo, profesión
+7. se implementará una gestión de opiniones por parte de los usuarios, donde antes de publicarse el admin deberá revisar y aprobar
+8. para la seguridad de los videos, se piensa usar una plataforma externa como Vimeo pro o bunny.net
+9. los pdf descargables tendrán marca de agua con nombre-correo-fecha descarga
+10. la duración aprox de los videos será de 25min como máximo en full hd
+11. la app debe ser internacional, para mercados en LATAM, españa y USA
+12. varios PDF por módulo
+13. FAQS en home
+14. para completar un módulo, el admin debe darle a un check "modulo completo/aprobado" desde el admin apra que dicho módulo quede completado, una vez el usuario tenga todos los módulos completados, se le habilitará un botón para descargar un certificado de curso
+
+
+

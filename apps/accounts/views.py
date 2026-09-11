@@ -33,6 +33,31 @@ class UserLogoutView(LogoutView):
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'accounts/profile.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        lang = self.request.user.prefer_language
+        enrollments = (
+            self.request.user.enrollments
+            .select_related('course')
+            .order_by('-activation_date', '-id')
+        )
+        items = []
+        for enrollment in enrollments:
+            vigente = enrollment.is_in_effect()
+            if enrollment.active_access and vigente:
+                estado = 'Vigente'
+            elif enrollment.active_access and not vigente:
+                estado = 'Caducada'
+            else:
+                estado = 'Pendiente de activación'
+            items.append({
+                'enrollment': enrollment,
+                'curso_titulo': enrollment.course.localized_titulo(lang),
+                'estado': estado,
+                'vigente': vigente,
+            })
+        context['enrollment_items'] = items
+        return context
 
 class UserPasswordResetView(PasswordResetView):
     template_name = 'accounts/password_reset.html'

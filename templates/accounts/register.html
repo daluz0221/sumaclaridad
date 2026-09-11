@@ -2,7 +2,7 @@
 {% block title %}Registro{% endblock %}
 {% block content %}
 <h1>Crear cuenta</h1>
-<form method="post" novalidate>
+<form class="auth-form" method="post" novalidate>
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit">Registrarme</button>

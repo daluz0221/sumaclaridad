@@ -2,7 +2,7 @@
 {% block title %}Entrar{% endblock %}
 {% block content %}
 <h1>Iniciar sesión</h1>
-<form method="post" novalidate>
+<form class="auth-form" method="post" novalidate>
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit">Entrar</button>

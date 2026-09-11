@@ -1,11 +1,56 @@
 {% extends "base.html" %}
-{% block title %}Perfil{% endblock %}
+{% block title %}Mi cuenta{% endblock %}
 {% block content %}
-<h1>Hola, {{ user.name }}</h1>
-<ul>
-  <li>Email: {{ user.email }}</li>
-  <li>Rol: {{ user.get_role_display }}</li>
-  <li>Idioma: {{ user.get_prefer_language_display }}</li>
-  <li>Consentimiento: {{ user.accepted_consent }} ({{ user.consent_date }})</li>
-</ul>
+<h1>Mi cuenta</h1>
+<div class="card">
+  <ul class="stack">
+    <li><strong>Nombre:</strong> {{ user.name }}</li>
+    <li><strong>Email:</strong> {{ user.email }}</li>
+    <li><strong>Rol:</strong> {{ user.get_role_display }}</li>
+    <li><strong>Idioma:</strong> {{ user.get_prefer_language_display }}</li>
+    <li><strong>Consentimiento:</strong> {{ user.accepted_consent }} ({{ user.consent_date }})</li>
+  </ul>
+</div>
+
+<h2>Estado de matrícula</h2>
+{% if enrollment_items %}
+  <div class="table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Curso</th>
+          <th>Estado</th>
+          <th>Activación</th>
+          <th>Caducidad</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in enrollment_items %}
+          <tr>
+            <td>{{ item.curso_titulo }}</td>
+            <td>
+              {% if item.estado == "Vigente" %}
+                <span class="badge badge--ok">{{ item.estado }}</span>
+              {% elif item.estado == "Caducada" %}
+                <span class="badge badge--warn">{{ item.estado }}</span>
+              {% else %}
+                <span class="badge badge--muted">{{ item.estado }}</span>
+              {% endif %}
+            </td>
+            <td>{{ item.enrollment.activation_date|default:"—" }}</td>
+            <td>{{ item.enrollment.expiration_date|default:"—" }}</td>
+            <td>
+              {% if item.vigente %}
+                <a href="{% url 'curso:module_list' item.enrollment.course.slug %}">Entrar al curso</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="empty">Aún no tienes matrículas. Cuando el pago se confirme, un administrador activará tu acceso.</p>
+{% endif %}
 {% endblock %}

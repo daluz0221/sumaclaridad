@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ course_titulo }}{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{% url 'curso:home' %}">← Mis cursos</a></p>
+<h1>{{ course_titulo }}</h1>
+{% if course_descripcion %}
+  <p class="lede">{{ course_descripcion }}</p>
+{% endif %}
+{% if enrollment %}
+  <p class="muted">Acceso vigente hasta {{ enrollment.expiration_date }}.</p>
+{% endif %}
+<h2>Módulos</h2>
+{% if module_items %}
+  <ol class="module-list">
+    {% for item in module_items %}
+      <li>
+        <a href="{% url 'curso:module_detail' course.slug item.module.slug %}">
+          <span class="module-list__num">{{ item.module.order }}</span>
+          <span>{{ item.titulo }}</span>
+        </a>
+      </li>
+    {% endfor %}
+  </ol>
+{% else %}
+  <p class="empty">Este curso aún no tiene módulos publicados.</p>
+{% endif %}
+{% endblock %}

@@ -2,6 +2,9 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
+from apps.catalog.models import Course
+from apps.enrollment.models import Enrollment
+
 User = get_user_model()
 
 
@@ -84,3 +87,22 @@ class UserModelTests(TestCase):
         client = Client()
         logged = client.login(email='login@test.com', password='Secreta123!')
         self.assertTrue(logged)
+
+    def test_profile_muestra_estado_de_matricula(self):
+
+        user = User.objects.create_user(
+            email='cuenta@test.com',
+            password='Secreta123!',
+            name='Cuenta',
+            phone='3000001111',
+            position='Jefe',
+        )
+        course = Course.objects.create(slug='jefes-a-punto', titulo_es='Jefes a Punto')
+        enrollment = Enrollment.objects.create(user=user, course=course)
+        enrollment.activate()
+        client = Client()
+        client.login(email='cuenta@test.com', password='Secreta123!')
+        response = client.get(reverse('accounts:profile'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Vigente')
+        self.assertContains(response, 'Jefes a Punto')

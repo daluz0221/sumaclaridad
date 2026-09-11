@@ -1,7 +1,22 @@
 {% extends "base.html" %}
-{% block title %}Curso{% endblock %}
+{% block title %}Mis cursos{% endblock %}
 {% block content %}
-<h1>Área del curso</h1>
-<p>Acceso concedido. (Placeholder Semana 1)</p>
-<p>Usuario: {{ user.email }}</p>
+<h1>Mis cursos</h1>
+<p class="lede">Elige un curso con matrícula vigente. Los módulos se pueden recorrer en cualquier orden.</p>
+{% if courses %}
+  <ul class="card-list">
+    {% for item in courses %}
+      <li class="card">
+        <h2>
+          <a href="{% url 'curso:module_list' item.course.slug %}">{{ item.titulo }}</a>
+        </h2>
+        {% if item.descripcion %}
+          <p>{{ item.descripcion }}</p>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="empty">No hay cursos publicados para tu matrícula.</p>
+{% endif %}
 {% endblock %}

@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.utils.html import format_html
 
 
 from .models import Enrollment
@@ -15,7 +14,7 @@ class EnrollmentAdmin(admin.ModelAdmin):
         'vigente',
     )
     list_filter = ('active_access', 'course')
-    search_fields = ('user__email', 'user__name', 'course__titulo', 'course__slug')
+    search_fields = ('user__email', 'user__name', 'course__titulo_es', 'course__slug')
     autocomplete_fields = ('user', 'course')
     readonly_fields = ('expiration_date',)
     actions = ('activar_matriculas', 'desactivar_matriculas')

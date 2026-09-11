@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Acceso denegado{% endblock %}
 {% block content %}
-<h1>Acceso denegado</h1>
-<p>No tienes una matrícula activa y vigente para entrar al curso.</p>
-<p><a href="{% url 'accounts:profile' %}">Volver al perfil</a></p>
+<div class="card">
+  <h1>Acceso denegado</h1>
+  <p>No tienes una matrícula activa y vigente para entrar al curso.</p>
+  <p><a class="btn" href="{% url 'accounts:profile' %}">Volver a Mi cuenta</a></p>
+</div>
 {% endblock %}
