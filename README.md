@@ -20,3 +20,7 @@ docker compose exec web python manage.py createsuperuser
 ## Tests
 docker compose exec web python manage.py test
 
+
+
+## Pendientes mios
+- revisar las variables de entorno y contrastar con IA

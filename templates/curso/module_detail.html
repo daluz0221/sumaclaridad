@@ -20,11 +20,20 @@
   {% for item in video_items %}
     <article class="card">
       <h3>{{ item.titulo }}</h3>
-      <p class="muted">Vídeo privado (placeholder Semana 2).</p>
-      {% if item.resource.video_ref %}
-        <p>Referencia: <code>{{ item.resource.video_ref }}</code></p>
+      {% if item.embed_url %}
+        <div class="video-embed">
+          <iframe
+            src="{{ item.embed_url }}"
+            title="{{ item.titulo }}"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowfullscreen>
+          </iframe>
+        </div>
+      {% else %}
+        <div class="placeholder">Vídeo aún no configurado (falta id de Bunny).</div>
       {% endif %}
-      <div class="placeholder">Aquí irá el player de Bunny Stream en la Semana 3.</div>
     </article>
   {% empty %}
     <p class="empty">No hay vídeos en este módulo.</p>
@@ -50,13 +59,15 @@
   {% for item in pdf_items %}
     <article class="card">
       <h3>{{ item.titulo }}</h3>
-      <p class="muted">PDF con marca de agua (placeholder Semana 2).</p>
-      {% if item.resource.pdf_ref %}
-        <p>Referencia: <code>{{ item.resource.pdf_ref }}</code></p>
+      {% if item.descargable %}
+        <p>
+          <a class="btn" href="{% url 'curso:pdf_download' course.slug module.slug item.resource.id %}">
+            Descargar
+          </a>
+        </p>
+      {% else %}
+        <p class="muted">PDF aún no configurado (falta key de S3).</p>
       {% endif %}
-      <p>
-        <button type="button" disabled>Descargar (disponible en Semana 3)</button>
-      </p>
     </article>
   {% empty %}
     <p class="empty">No hay PDFs en este módulo.</p>

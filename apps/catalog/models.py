@@ -97,12 +97,12 @@ class Resource(TranslatableMixin, models.Model):
     video_ref = models.CharField(
         max_length=255,
         blank=True,
-        help_text='Placeholder Semana 2. En Semana 3 será el id/token de Bunny.',
+        help_text='Video ID de Bunny Stream (UUID). Vacío o pending:// = sin player.',
     )
     pdf_ref = models.CharField(
         max_length=255,
         blank=True,
-        help_text='Placeholder Semana 2. En Semana 3 será la key de S3.',
+        help_text='Key S3 del PDF base, p. ej. pdfs/jefes-a-punto/bienvenida/guia-1.pdf',
     )
     is_published = models.BooleanField(default=True)
 

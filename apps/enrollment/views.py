@@ -1,9 +1,14 @@
 from django.http import Http404
 from django.utils import timezone
 from django.views.generic import DetailView, ListView, TemplateView
+
 from apps.catalog.models import Course, Module, Resource
+
 from apps.enrollment.mixins import CourseEnrollmentRequiredMixin
 from apps.enrollment.models import Enrollment
+
+from apps.documents.services import is_s3_pdf_key
+from apps.media_video.services import build_embed_url
 
 def _lang(user):
     return getattr(user, 'prefer_language', 'es') or 'es'
@@ -107,6 +112,8 @@ class ModuleDetailView(CourseEnrollmentRequiredMixin, DetailView):
                     'resource': r,
                     'titulo': r.localized_titulo(lang),
                     'texto': r.localized_texto(lang),
+                    'embed_url': build_embed_url(r.video_ref) if r.tipo == Resource.Tipo.VIDEO else None,
+                    'descargable': r.tipo == Resource.Tipo.PDF and is_s3_pdf_key(r.pdf_ref),
                 })
             return packed
         context['video_items'] = pack(context['videos'])

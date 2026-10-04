@@ -182,5 +182,19 @@ EMAIL_BACKEND = os.getenv(
 )
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'no-reply@jefesapunto.com')
 
+# Bunny Stream
+# BUNNY_API_KEY es la API Key de gestión de la librería. El embed no la usa.
+BUNNY_LIBRARY_ID = os.getenv('BUNNY_LIBRARY_ID', '')
+BUNNY_API_KEY = os.getenv('BUNNY_API_KEY', '')
+BUNNY_TOKEN_SECURITY_KEY = os.getenv('BUNNY_TOKEN_SECURITY_KEY', '')
+BUNNY_EMBED_HOST = os.getenv('BUNNY_EMBED_HOST', 'player.mediadelivery.net')
+BUNNY_EMBED_TOKEN_TTL = int(os.getenv('BUNNY_EMBED_TOKEN_TTL', '3600'))
+
+# Amazon S3 
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', '')
+AWS_S3_REGION = os.getenv('AWS_S3_REGION', '')
+AWS_S3_BUCKET = os.getenv('AWS_S3_BUCKET', '')
+AWS_S3_SIGNED_URL_TTL = int(os.getenv('AWS_S3_SIGNED_URL_TTL', '120'))
 
 TEMPLATES[0]['DIRS'] = [BASE_DIR / 'templates']
