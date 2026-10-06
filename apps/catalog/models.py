@@ -76,6 +76,12 @@ class Module(TranslatableMixin, models.Model):
     def localized_intro(self, lang='es'):
         return self.pick('intro', lang)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        from apps.enrollment.models import Enrollment
+        for enrollment in Enrollment.objects.filter(course_id=self.course_id, active_access=True):
+            enrollment.ensure_module_completions()
+
 
 class Resource(TranslatableMixin, models.Model):
     class Tipo(models.TextChoices):

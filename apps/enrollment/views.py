@@ -73,6 +73,11 @@ class CourseModuleListView(CourseEnrollmentRequiredMixin, ListView):
                 'titulo': module.localized_titulo(lang),
             })
         context['module_items'] = labeled_modules
+        context['certificate_ready'] = bool(
+            self.enrollment
+            and self.enrollment.is_in_effect()
+            and self.enrollment.all_modules_approved()
+        )
         return context
 
 class ModuleDetailView(CourseEnrollmentRequiredMixin, DetailView):

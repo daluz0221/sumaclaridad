@@ -9,6 +9,11 @@
 {% if enrollment %}
   <p class="muted">Acceso vigente hasta {{ enrollment.expiration_date }}.</p>
 {% endif %}
+{% if certificate_ready %}
+  <p class="certificate-banner">
+    <a class="btn" href="{% url 'curso:certificate_download' course.slug %}">Descargar certificado</a>
+  </p>
+{% endif %}
 <h2>Módulos</h2>
 {% if module_items %}
   <ol class="module-list">

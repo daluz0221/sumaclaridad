@@ -6,8 +6,8 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from apps.catalog.models import Course
-from apps.enrollment.models import Enrollment
+from apps.catalog.models import Course, Module
+from apps.enrollment.models import Enrollment, ModuleCompletion, Certificate
 
 User = get_user_model()
 
@@ -240,3 +240,73 @@ class CursoNavegacionTests(TestCase):
         self._login_activo()
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, 404)
+
+class ModuleApprovalTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='cert@test.com',
+            password='Secreta123!',
+            name='Ana Perez',
+            phone='3001234567',
+            position='Jefe',
+        )
+        self.admin = User.objects.create_superuser(
+            email='admin-cert@test.com',
+            password='Secreta123!',
+            name='Admin',
+            phone='3000000000',
+            position='Admin',
+        )
+        self.course = Course.objects.create(slug='jefes-a-punto', titulo_es='Jefes a Punto', titulo_en='Leaders Ready')
+        self.module_a = Module.objects.create(course=self.course, slug='bienvenida', order=1, titulo_es='Bienvenida')
+        self.module_b = Module.objects.create(course=self.course, slug='cierre', order=2, titulo_es='Cierre')
+        self.enrollment = Enrollment.objects.create(user=self.user, course=self.course)
+        self.enrollment.activate()
+
+    def test_nombres_describen_alumno_curso_y_modulo(self):
+        row = ModuleCompletion.objects.get(enrollment=self.enrollment, module=self.module_a)
+        self.assertEqual(str(self.enrollment), 'Ana Perez (cert@test.com) — Jefes a Punto')
+        self.assertEqual(str(row), 'Ana Perez — Bienvenida (Pendiente)')
+
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse('admin:enrollment_modulecompletion_changelist'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Ana Perez (cert@test.com) — Jefes a Punto')
+        self.assertContains(response, 'Avances de módulo')
+        self.assertNotContains(response, 'Enrollment object')
+
+    def test_activar_crea_una_fila_pendiente_por_modulo(self):
+        rows = ModuleCompletion.objects.filter(enrollment=self.enrollment)
+        self.assertEqual(rows.count(), 2)
+        self.assertTrue(all(row.estado == ModuleCompletion.Estado.PENDIENTE for row in rows))
+
+    def test_un_rechazado_no_habilita_certificado(self):
+        ModuleCompletion.objects.filter(enrollment=self.enrollment, module=self.module_a).update(
+            estado=ModuleCompletion.Estado.APROBADO,
+        )
+        row_b = ModuleCompletion.objects.get(enrollment=self.enrollment, module=self.module_b)
+        row_b.estado = ModuleCompletion.Estado.RECHAZADO
+        row_b.save()
+        self.enrollment.refresh_from_db()
+        self.assertFalse(self.enrollment.all_modules_approved())
+        self.assertFalse(Certificate.objects.filter(enrollment=self.enrollment).exists())
+
+    def test_modulo_nuevo_crea_fila_en_matricula_activa(self):
+        Module.objects.create(course=self.course, slug='extra', order=3, titulo_es='Extra')
+        self.assertEqual(self.enrollment.module_completions.count(), 3)
+
+    def test_listado_muestra_el_boton_solo_con_todos_aprobados(self):
+        self.client.login(email='cert@test.com', password='Secreta123!')
+        url = reverse('curso:module_list', kwargs={'course_slug': self.course.slug})
+        response = self.client.get(url)
+        self.assertNotContains(response, 'Descargar certificado')
+
+        ModuleCompletion.objects.filter(enrollment=self.enrollment).update(
+            estado=ModuleCompletion.Estado.APROBADO,
+        )
+        response = self.client.get(url)
+        self.assertContains(response, 'Descargar certificado')
+        self.assertContains(
+            response,
+            reverse('curso:certificate_download', kwargs={'course_slug': self.course.slug}),
+        )   

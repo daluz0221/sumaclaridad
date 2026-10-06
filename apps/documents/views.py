@@ -1,9 +1,14 @@
 from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render
 from django.views import View
 from django.utils.text import slugify
 
 from apps.catalog.models import Resource
-from apps.documents.services import is_s3_pdf_key, issue_watermarked_download
+from apps.documents.services import (
+    is_s3_pdf_key,
+    issue_watermarked_download,
+    presigned_download_url,
+)
 from apps.enrollment.mixins import CourseEnrollmentRequiredMixin
 
 class PdfDownloadView(CourseEnrollmentRequiredMixin, View):
@@ -35,4 +40,24 @@ class PdfDownloadView(CourseEnrollmentRequiredMixin, View):
             resource_id=resource.id,
             filename=filename,
         )
+        return HttpResponseRedirect(url)
+
+class CertificateDownloadView(CourseEnrollmentRequiredMixin, View):
+    def get(self, request, course_slug):
+        enrollment = self.enrollment
+        allowed = (
+            enrollment is not None
+            and enrollment.is_in_effect()
+            and enrollment.all_modules_approved()
+        )
+        if not allowed:
+            return render(request, 'accounts/access_denied.html', status=403)
+
+        certificate = enrollment.issue_certificate_if_ready()
+        if certificate is None or not certificate.s3_key:
+            return render(request, 'accounts/access_denied.html', status=403)
+
+        lang = certificate.idioma if certificate.idioma in ('es', 'en') else 'es'
+        filename = f'{slugify(self.course.localized_titulo(lang)) or "certificado"}.pdf'
+        url = presigned_download_url(certificate.s3_key, filename)
         return HttpResponseRedirect(url)

@@ -86,3 +86,49 @@ def issue_watermarked_download(base_key, user, resource_id, filename):
     marked_key = store_watermarked_pdf(marked, user.id, resource_id)
     return presigned_download_url(marked_key, filename)
 
+
+def render_certificate_pdf(name, course_title, codigo, idioma):
+    idioma = idioma if idioma in ('es', 'en') else 'es'
+    copy = {
+        'es': {
+            'title': 'Certificado',
+            'line': 'Se certifica que',
+            'completed': 'ha aprobado el curso',
+            'code': 'Código',
+        },
+        'en': {
+            'title': 'Certificate',
+            'line': 'This certifies that',
+            'completed': 'has completed the course',
+            'code': 'Code',
+        },
+    }[idioma]
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer)
+    c.setFont('Helvetica-Bold', 22)
+    c.drawString(72, 760, copy['title'])
+    c.setFont('Helvetica', 12)
+    c.drawString(72, 710, copy['line'])
+    c.setFont('Helvetica-Bold', 14)
+    c.drawString(72, 680, name or '')
+    c.setFont('Helvetica', 12)
+    c.drawString(72, 650, copy['completed'])
+    c.setFont('Helvetica-Bold', 14)
+    c.drawString(72, 620, course_title or '')
+    c.setFont('Helvetica', 12)
+    c.drawString(72, 560, f"{copy['code']}: {codigo}")
+    c.showPage()
+    c.save()
+    return buffer.getvalue()
+
+
+def store_certificate_pdf(pdf_bytes, enrollment_id, codigo):
+    key = f'certificates/{enrollment_id}/{codigo}.pdf'
+    s3_client().put_object(
+        Bucket=settings.AWS_S3_BUCKET,
+        Key=key,
+        Body=pdf_bytes,
+        ContentType='application/pdf',
+        ServerSideEncryption='AES256',
+    )
+    return key

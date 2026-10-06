@@ -207,6 +207,10 @@ h2 {
   min-width: 1.5rem;
 }
 
+.certificate-banner {
+  margin: 0 0 1.5rem;
+}
+
 .video-embed {
   position: relative;
   width: 100%;
